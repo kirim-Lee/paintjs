@@ -2,15 +2,18 @@ const canvas = document.getElementById("jsCanvas");
 const ctx = canvas.getContext("2d");
 const jsColors = document.getElementsByClassName('jsColor'); // color btns
 const jsRange = document.getElementById('jsRange'); // stroke width btn
-
+const jsMode = document.getElementById('jsMode'); // fill / stroke toggle
+const INITIAL_COLOR = 'black';
+let painting = false; // is painting
+let filling = false; // is fill mode
 
 canvas.width = 700;
 canvas.height = 700;
 
-ctx.strokeStyle = 'black'; // color
+ctx.strokeStyle = INITIAL_COLOR; // color
+ctx.fillStyle = INITIAL_COLOR; // fill color
 ctx.lineWidth = 2.5; // bold
 
-let painting = false;
 
 function stopPainting() {
   painting = false;
@@ -33,14 +36,33 @@ function onMouseMove(event) {
   }
 }
 
+function handleCanvasClick() {
+    if (filling) {
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
 function handleColorClick (event) {
     const target = event.target;
-    const color = target && target.style.backgroundColor ? target.style.backgroundColor : 'black';
+    const color = target && target.style.backgroundColor ? target.style.backgroundColor : INITIAL_COLOR;
     ctx.strokeStyle = color; 
+    ctx.fillStyle = color;
 }
 
 function handleRagneClick (event) {
     ctx.lineWidth = event.target.value;
+}
+
+function handleModeClick () {
+    filling = !filling;
+    if (filling) {
+        // fill mode
+        jsMode.innerText = 'Paint';
+        ctx.fillStyle = ctx.strokeStyle;
+    } else {
+        // paint mode
+        jsMode.innerText = 'Fill';
+        ctx.strokeStyle = ctx.fillStyle;
+    }
 }
 
 if (canvas) {
@@ -48,6 +70,7 @@ if (canvas) {
   canvas.addEventListener("mousedown", startPainting);
   canvas.addEventListener("mouseup", stopPainting);
   canvas.addEventListener("mouseleave", stopPainting);
+  canvas.addEventListener('click', handleCanvasClick);
 }
 
 if (jsColors) {
@@ -56,4 +79,8 @@ if (jsColors) {
 
 if (jsRange) {
     jsRange.addEventListener('input', handleRagneClick);
+}
+
+if (jsMode) {
+    jsMode.addEventListener('click', handleModeClick);
 }
